@@ -2,8 +2,9 @@ import { UserModel } from "./db";
 import express, {Request, Response} from 'express';
 import {z} from 'zod';
 import bcrypt from 'bcrypt';
-
+import jwt from 'jsonwebtoken';
 const router = express.Router();
+const jwtsecret = process.env.JWT_SECRET as string;
 
 router.post("/signup", async (req: Request, res: Response) => {
 
@@ -45,5 +46,28 @@ router.post("/signup", async (req: Request, res: Response) => {
         res.json({message: err})
     }
 }) 
+
+router.post("/signin", async (req: Request, res: Response) =>{
+
+    const {email, password} = req.body;
+
+    const findEmail = await UserModel.findOne({email})
+
+    if(!findEmail) {
+        return res.json({message: "Email doesn't exist."})
+    }
+    //@ts-ignore
+    const isMatch = await bcrypt.compare(password, findEmail.password)
+
+    if(!isMatch) {
+        return res.json({message: "Incorrect Password"})
+    }
+
+    const token = jwt.sign({
+        id: findEmail._id
+    }, jwtsecret)
+
+    res.json({token})
+})
 
 export default router; 
