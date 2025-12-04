@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import mongoose, {Schema, model} from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 async function main () {
     try {
@@ -27,3 +28,20 @@ const UserSchema = new Schema ({
 })
 
 export const UserModel = model("User", UserSchema);
+
+const contentSchema = new Schema ({
+    title: String,
+    link: String, 
+    type: String,
+    tags: [{type: ObjectId, ref: 'Tag'}],
+    tagName: [String],
+    userId: {type: ObjectId, ref:'User', required: true}
+})
+
+export const contentModel = model ("Content", contentSchema);
+
+const tagSchema = new Schema ({
+    name: String
+})
+
+export const tagModel = model("Tag", tagSchema);
