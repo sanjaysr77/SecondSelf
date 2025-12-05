@@ -1,13 +1,44 @@
 import express from 'express';
 import { userMiddleware } from './userMiddleware';
 import { contentModel, tagModel } from './db';
-
+import {z} from 'zod';
 
 const router = express.Router();
 
+const contentSchema = z.object({
+    link: z.string().url(),
+    type: z.string().min(1),
+    title: z.string().min(1),
+    tags: z.union([
+        z.array(z.string()),
+        z.string()
+    ]).optional()
+});
+
 router.post("/content", userMiddleware, async (req, res) => {
     try {
-        const {link, type, title, tags = []} = req.body;
+
+        const validation = contentSchema.safeParse(req.body);
+
+        if(!validation.success) {
+            return res.status(400).json ({
+                message: "Invalid request format",
+                details: validation.error
+            })
+        }
+
+        let {link, type, title, tags = []} = validation.data;
+
+        if (typeof tags === "string") {
+            
+            tags = tags
+                .replace(/[\[\]]/g, "")    // remove brackets if present
+                .split(",")
+                .map(t => t.trim())
+                .filter(Boolean);
+        }
+
+        if (!Array.isArray(tags)) tags = [];
 
         const tagIds = [];
         const tagNames = [];
