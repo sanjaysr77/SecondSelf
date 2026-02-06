@@ -70,4 +70,15 @@ router.post("/content", userMiddleware, async (req, res) => {
     }
 })
 
+router.get("/content", userMiddleware, async (req, res) => {
+    //@ts-ignore
+    const userId = req.userId;
+    const content = await contentModel.find({
+        userId: userId
+    })//.populate("userId", "username password _id")
+    res.json({
+        content: content
+    })
+})
+
 export default router;

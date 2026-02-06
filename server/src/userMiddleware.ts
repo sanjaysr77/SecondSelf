@@ -5,7 +5,7 @@ const jwtsecret = process.env.JWT_SECRET as string;
 export function userMiddleware (req: Request, res: Response, next: NextFunction) {
 
     const token = req.headers.token;
-    console.log(token);
+    //console.log(token);
     const decoded = jwt.verify(token as string, jwtsecret);
     console.log(decoded);
 
