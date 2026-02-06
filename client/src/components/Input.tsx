@@ -1,0 +1,13 @@
+
+interface InputProps {
+    placeholder: string;
+}
+
+export function Input({ placeholder }: InputProps) {
+    return (
+        <div>
+            <input placeholder={placeholder} type="text" className="px-4 py-2 border rounded m-2">
+            </input>
+        </div>
+    )
+}
