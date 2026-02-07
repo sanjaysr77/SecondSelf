@@ -1,18 +1,27 @@
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import { useEffect, useState } from "react";
 
-export async function Dashboard () {
-    await axios.get(`${BACKEND_URL}/v1/content`, {
+export function Dashboard() {
+  const [data, setData] = useState(null);
+
+
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/v1/content`, {
         headers: {
-            "Authorization": localStorage.getItem("token")
-        }
-    }).then((res) =>{
-        console.log(res)
-    })
+          token: `${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setData(res.data);
+        console.log(res.data.content)
+      });
+  }, []);
 
-    return (
-        <div>
-            {/* {res} */}
-        </div>
-    )
+  return (
+    <div>
+      {JSON.stringify(data)}
+    </div>
+  );
 }
