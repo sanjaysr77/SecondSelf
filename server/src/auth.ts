@@ -51,23 +51,23 @@ router.post("/signin", async (req: Request, res: Response) =>{
 
     const {email, password} = req.body;
 
-    const findEmail = await UserModel.findOne({email})
+    const user = await UserModel.findOne({email})
 
-    if(!findEmail) {
-        return res.json({message: "Email doesn't exist."})
+    if(!user) {
+        return res.status(401).json({message: "Email doesn't exist."})
     }
     //@ts-ignore
-    const isMatch = await bcrypt.compare(password, findEmail.password)
+    const isMatch = await bcrypt.compare(password, user.password)
 
     if(!isMatch) {
-        return res.json({message: "Incorrect Password"})
+        return res.status(401).json({message: "Incorrect Password"})
     }
 
     const token = jwt.sign({
-        id: findEmail._id
+        id: user._id
     }, jwtsecret)
 
-    res.json({token})
+    res.status(200).json({token})
 })
 
 export default router; 
