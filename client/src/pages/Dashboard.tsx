@@ -1,27 +1,39 @@
-import axios from "axios";
-import { BACKEND_URL } from "../config";
 import { useEffect, useState } from "react";
+import { useContent } from "../hooks/useContent";
+import { Sidebar } from "../components/Sidebar";
+import { CreateContentModal } from "../components/CreateContentModal";
+import { Button } from "../components/Button";
+import { PlusIcon } from "../icons/PlusIcon";
+import { Card } from "../components/Card";
 
 export function Dashboard() {
-  const [data, setData] = useState(null);
-
+  const [modalOpen, setModalOpen] = useState(false)
+  const { refresh, contents } = useContent();
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/v1/content`, {
-        headers: {
-          token: `${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        setData(res.data);
-        console.log(res.data.content)
-      });
-  }, []);
+    refresh()
+  }, [modalOpen])
 
   return (
     <div>
-      {JSON.stringify(data)}
+      <Sidebar />
+      <div className="p-4 ml-72 min-h-screen bg-gray-100 border-2">
+        <CreateContentModal open={modalOpen} onClose={() => {
+          setModalOpen(false)
+        }} />
+        <div className="flex justify-end gap-4">
+          <Button onClick={() => {
+            setModalOpen(true)
+          }} variant="primary" text="Add content" startIcon={<PlusIcon />} />
+        </div>
+        <div className="flex gap-4 flex-wrap">
+          {contents.map(({type, link, title}) => <Card 
+            type={type}
+            link={link}
+            title={title}
+        />)}
+        </div>
+      </div>
     </div>
-  );
+  )
 }
